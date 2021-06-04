@@ -1,53 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { airPlaneTicket } from '../../mobx-store';
+import { observer } from 'mobx-react';
 
 import Tickets from './Tickets';
+import { Spinner } from '../../components/Spinner';
+import { myPlaneTicket } from '../../mobx-store/airPlaneTicket'
 
-
-const tickets = [{
-price: 10, city: 'Lviv'
-},{price: 100, city: 'Merefa'},{price: 123, city: "Paris" }
-]
-
-
-const Result = props => {
-  const [showResult, setShowResult] = useState(false);
+const Result = observer( props => {
   const [showSpinner, setShowSpinner] = useState(true);
 
-  const report = airPlaneTicket.report();
+  useEffect(() => setTimeout(() => setShowSpinner(false), 3000))
 
-  useEffect(() => {
-    setTimeout(() => {
-      if(report === 'We have enough data'){
-        setShowResult(true)
-      }
-    }, 5000);
-  })
-
-  useEffect(()=> {
-    console.log(airPlaneTicket.waitForResponse);
-    setShowSpinner(airPlaneTicket.waitForResponse)
-  }, [airPlaneTicket.waitForResponse])
-
+  const { tickets, report } = myPlaneTicket;
   return(
     <div className="flex justC-center">
-      {showResult
-        ? <div>
-          <Tickets />
-        </div>
-        : <div className="w-100">
-          <p className="report-message">{report}</p>
-          {
-            showSpinner 
-            ? <div className="spin-wrapper">
-              <div className="spinner" />
-            </div>
-            : null
-          }
-        </div>
+      {showSpinner 
+        ? <Spinner message={report()}/>
+        : tickets.length
+          ? <Tickets tickets={tickets}/>
+          : <Spinner />
       }
     </div>
   )
-}
+})
 
 export default Result;

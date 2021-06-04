@@ -24,7 +24,7 @@ const Card = props => {
         { !showInput && !props.isShort && 
             <>
               <h2>{props.value}</h2>
-              <h3 className="shortName">{props.value.slice(0,3)}</h3>
+              <h3 className="shortName">{props.value}</h3>
             </>
         }
       </div>

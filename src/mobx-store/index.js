@@ -1,3 +1,3 @@
-import { createAirPlaneTicket} from './airPlaneTicket';
+// import { createAirPlaneTicket} from './airPlaneTicket';
 
-export const airPlaneTicket = createAirPlaneTicket();
+// export const airPlaneTicket = createAirPlaneTicket();

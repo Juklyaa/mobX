@@ -9,6 +9,8 @@ import './App.css';
 
 import AirplaneContainer from './scenes/avia';
 import Result from './scenes/result';
+import Cart from './scenes/cart';
+import { CartIcon } from './components/CartIcon';
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
             <li>
               <Link to="/hotel">Hotel</Link>
             </li>
+            <CartIcon />
           </ul>
         </nav>
 
@@ -43,6 +46,9 @@ function App() {
           </Route>
           <Route path="/result">
             <Result />
+          </Route>
+          <Route path="/cart">
+            <Cart />
           </Route>
           <Route path="/">
             <Home />

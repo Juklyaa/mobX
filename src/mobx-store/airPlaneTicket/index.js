@@ -1,4 +1,4 @@
-import { action, observable, autorun } from 'mobx';
+import { makeAutoObservable, action, observable, autorun, computed } from 'mobx';
 
 const getRandomArbitrary = (min, max) => {
   return Math.round(Math.random() * (max - min) + min);
@@ -6,90 +6,79 @@ const getRandomArbitrary = (min, max) => {
 
 const airLine = ['Emirates', 'Sky Up', 'Air Berlin', 'MAU', 'Air Malta', 'Ryan air'];
 
-const airPlaneTicket = {
-  departureCity: 'Kharkiv',
-  arrivalCity: 'Paris',
-  departureDate: new Date(),
-  returnDate: new Date(),
-  passengerAdult: 1,
-  passengerChildren: 0,
+class PlaneTicket {
+  departureCity ='Kharkiv'
+  arrivalCity = 'Paris'
+  departureDate = new Date()
+  returnDate = new Date()
+  passengerAdult = 1
+  passengerChildren = 0
+  tickets = []
 
-  waitForResponse: false,
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true })
+  }
+  
+  setDepartureCity (city) {
+    this.departureCity = city;
+  }
+  setArrivalCity (city) {
+    this.arrivalCity = city;
+  }
 
-  get routeChosen () {
-    return !!this.departureCity && !!this.arrivalCity;
-  },
+  setDepartureDate (date) {
+    this.departureDate = date;
+  }
+  setReturnDate (date) {
+    this.returnDate = date;
+  }
 
-  get stringDepartureDate () {
+  isRouteChosen () {
+    return this.departureCity && this.arrivalCity;
+  }
+
+  areDataSame () {
+    return this.getStringDepartureDate() === this.getStringReturnDate();
+  }
+
+  getStringDepartureDate () {
     const d = this.departureDate;
-    return d.getDate() + "-" + (d.getMonth()+1) + "-" + d.getFullYear();
-  },
+    return d.getDate() + "-" + (d.getMonth()) + "-" + d.getFullYear();
+  }
 
-  get stringReturnDate () {
+  getStringReturnDate () {
     const d = this.returnDate;
-    return d.getDate() + "-" + (d.getMonth()+1) + "-" + d.getFullYear();
-  },
+    return d.getDate() + "-" + (d.getMonth()) + "-" + d.getFullYear();
+  }
 
-  getTicket(responseApi) {
-    const countTickets = getRandomArbitrary(2, 10);
-    let tickets = [];
-    for(let i=0; i++; i <countTickets){
-      tickets.push(responseApi);
-      tickets[0].price = responseApi.price * Math.random();
+  getUrlRequest () {
+    return `https://polar-hollows-24549.herokuapp.com/get_tickets?departureCity=${this.departureCity}&arrivalCity=${this.arrivalCity}&departureDate=${this.getStringDepartureDate()}&returnDate=${this.getStringReturnDate()}&passengerAdult=${this.passengerAdult}&passengerChildren=${this.passengerChildren}`
+  }
+
+  searchTicket () {
+    const isEnoughDataForSearching = 
+      this.isRouteChosen() &&
+      !this.areDataSame() &&
+      this.passengerAdult >= 1
+
+    if(isEnoughDataForSearching) {
+      const url = this.getUrlRequest();
+      
+      fetch(url)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        const tickets = data.body;
+        console.log(tickets);
+        this.setTickets(tickets);
+      });
     }
-    console.log(tickets);
-    return {};
-  },
+  }
 
-  report() {
-    if (!this.routeChosen){
-      return 'You should select city';
-    } else if(this.stringDepartureDate === this.stringReturnDate){
-      return 'Something wrong with date'
-    } else if(this.passengerAdult < 1){
-      return 'Who travels?'
-    } else return 'We have enough data'
-  },
-
-  setDepartureCity: action(
-    'SET DEPARTURE CITY',
-    function (city) {
-      this.departureCity = city;
-    }
-  ),
-
-  setArrivalCity: action(
-    'SET ARRIVE CITY',
-    function (city) {
-      this.arrivalCity = city;
-    }
-  ),
-
-  setDepartureDate: action(
-    'SET DEPARTURE DATE',
-    function (date) {
-      this.departureDate = date;
-    }
-  ),
-
-  setReturnDate: action(
-    'SET RETURN DATE',
-    function (city) {
-      this.returnDate = city;
-    }
-  ),
-
-  setWaitForResponse: action(
-    'SET waitForResponse',
-    function (waitForResponse) {
-      this.waitForResponse = waitForResponse;
-    }
-  ),
-
-  setTickets: action(
+  setTickets = action(
     'SET TICKETS',
     function(responseApi){
-      console.log(responseApi)
       const countTickets = getRandomArbitrary(2, 10);
       let tickets = [];
       tickets.length = countTickets;
@@ -103,14 +92,24 @@ const airPlaneTicket = {
           route:getRandomArbitrary(1000, 9999)
         };
       }
-      console.log(tickets);
       this.tickets = tickets;
     }
   )
-};
 
-export const createAirPlaneTicket = () => observable(airPlaneTicket);
+  report() {
+    if (!this.isRouteChosen()){
+      return 'You should select city';
+    } else if(this.areDataSame()){
+      return 'Something wrong with date. Are you sure you want to came back in the same data?'
+    } else if(this.passengerAdult < 1){
+      return 'Who travels?'
+    } else return 'We have enough data'
+  }
+}
 
+export const myPlaneTicket = new PlaneTicket();
+
+autorun(() => console.log(myPlaneTicket.departureCity, ' -----  ', myPlaneTicket.departureDate))
 
 export const state = observable({ value:  10});
 
@@ -118,5 +117,3 @@ export const increment = action(state => {
     state.value++
     state.value++
 });
-
-

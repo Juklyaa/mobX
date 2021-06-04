@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import Card from '../../components/Card';
-import { airPlaneTicket } from '../../mobx-store';
 
-const DateCard = props => {
-  const [departure, setDeparture] = useState(airPlaneTicket.departureDate);
-  const [returnDate, setReturnDate] = useState(airPlaneTicket.returnDate);
+const DateCard = observer(({ ticket }) => {
+  const {
+    departureDate,
+    returnDate,
+    setReturnDate,
+    setDepartureDate 
+  } = ticket;
 
   const handleDepartureDate = date => {
-    airPlaneTicket.setDepartureDate(date)
-    setDeparture(date)
+    setDepartureDate(date)
   }
 
-  const handleReturnDate = date => {
-    console.log(date);
-    airPlaneTicket.setReturnDate(date)
+  const handleReturnDate = function (date) {
     setReturnDate(date)
   }
-
-  console.log(returnDate);
 
   return(
     <div className="flex w-50">
@@ -30,7 +29,7 @@ const DateCard = props => {
         buttonName="Select Date"
         isShort
       >
-       <DatePicker selected={departure} onChange={handleDepartureDate} />
+       <DatePicker selected={departureDate} onChange={handleDepartureDate} />
       </Card>
       <Card 
         label="Return"
@@ -41,7 +40,7 @@ const DateCard = props => {
       </Card>
     </div>
   )
-}
+})
 
 
 export default DateCard;

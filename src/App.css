@@ -248,8 +248,31 @@ li{
   border: 1px solid black;
   padding: 20px;
   border-radius: 10px;
+  width: 300px;
+}
+
+.price{
+  margin: 10px;
+}
+
+.emptyBasket{
+  height: 80vh;
+  width: 100%;
+  background: url(./static/empty-basket.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .airLine{
   align-self: flex-end;
+}
+
+.spin-message{
+  margin: 0;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
 }

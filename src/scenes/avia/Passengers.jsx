@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
+import { observer } from 'mobx-react';
 
 import Card from '../../components/Card';
 import Passenger from './passenger';
-import { airPlaneTicket } from '../../mobx-store';
 
-const Passengers = props => {
-  const [passengers, setPassengers] = useState(airPlaneTicket.passengers);
-
+const Passengers = observer((ticket) => {
 
   return(
     <div className="flex w-50">
@@ -28,6 +26,6 @@ const Passengers = props => {
       </Card>
     </div>
   )
-}
+})
 
 export default Passengers;

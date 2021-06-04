@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
 
 import Input from '../../components/Input';
@@ -6,49 +6,30 @@ import Card from '../../components/Card';
 import DateCard from './DateCard';
 import Passengers from './Passengers';
 
-import { airPlaneTicket } from '../../mobx-store';
+import { myPlaneTicket } from '../../mobx-store/airPlaneTicket'
 import { increment, state} from '../../mobx-store/airPlaneTicket';
 import { useHistory } from "react-router-dom";
 
 
-const AirplaneContainer = observer(
-  () => {
+const AirplaneContainer = observer(() => {
     let history = useHistory();
-    const [departureCity, setDepartureCity] = useState(airPlaneTicket.departureCity);
-    const [arrivalCity, setArrivalCity] = useState(airPlaneTicket.arrivalCity);
+    
+    const {
+      arrivalCity,
+      departureCity,
+      passengerAdult,
+      passengerChildren,
+      stringReturnDate,
+      stringDepartureDate,
 
+      setDepartureCity,
+      setArrivalCity,
+      searchTicket,
+    } = myPlaneTicket;
+    
     const handleSearchBtn = () => {
-      airPlaneTicket.setDepartureCity(departureCity);
-      airPlaneTicket.setArrivalCity(arrivalCity);
-
-      increment(state)
-
       history.push("/result");
-
-      const returnDate = airPlaneTicket.stringReturnDate;
-      const departureDate = airPlaneTicket.stringDepartureDate;
-
-      const {
-        passengerAdult,
-        passengerChildren
-      } = airPlaneTicket;
-
-      const url = `https://polar-hollows-24549.herokuapp.com/get_tickets?departureCity=${departureCity}&arrivalCity=${arrivalCity}&departureDate=${departureDate}&returnDate=${returnDate}&passengerAdult=${passengerAdult}&passengerChildren=${passengerChildren}`
-      
-      airPlaneTicket.setWaitForResponse(true);
-      fetch(url)
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setTimeout(
-            () => {
-              airPlaneTicket.setWaitForResponse(false)
-              const tickets = data.body;
-              airPlaneTicket.setTickets(tickets);
-            }, 3000);
-          console.log(data);
-        });
+      searchTicket();
     }
 
     return(
@@ -75,17 +56,17 @@ const AirplaneContainer = observer(
               <Input
                 inputClassName="citiesSearch"
                 placeholder="Enter city or country"
-                setValue={setArrivalCity}  
+                setValue={setArrivalCity}   
                 value={arrivalCity}
               />
             </Card>
           </div>
           <div className="flex">
-            <DateCard />
-            <Passengers />
+            <DateCard ticket={myPlaneTicket}/>
+            <Passengers ticket={myPlaneTicket}/>
           </div>
-        </div>
-        <button className="search-btn" onClick={handleSearchBtn}>Search</button>
+          </div>
+        <button onClick={handleSearchBtn} className="search-btn">Search</button>
       </div>
     )
   }
